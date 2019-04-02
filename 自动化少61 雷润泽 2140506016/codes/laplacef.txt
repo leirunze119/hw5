@@ -1,0 +1,12 @@
+function filter = laplacef(size1,size2)
+    %生成butterworth滤波器
+    %size1-滤波器高度(这里应为图像大小的两倍）
+    %size2-滤波器宽度（同上）
+    filter=zeros(size1,size2);
+    for i=1:size1
+        for j=1:size2
+            filter(i,j)=-4*pi*pi*(power((1+size1)/2-i,2)+power((1+size2)/2-j,2));
+        end
+    end
+end
+

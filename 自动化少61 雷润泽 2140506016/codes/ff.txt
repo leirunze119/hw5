@@ -1,0 +1,39 @@
+function [imgo,imgfi,imgfo,filter] = ff(imgi,method,pass,args)
+    %频域滤波
+    %imgi-输入图像
+    %method-选用的滤波方法
+    %pass-低通/高通
+    %args-滤波器参数
+    %imgo-处理后的图像
+    %imgfi-输入图像的频域图形
+    %imgfo-输出图像的频域图形
+    h=size(imgi,1);
+    w=size(imgi,2);
+    imgtemp=zeros(2*h,2*w);
+    for i=1:h
+        for j=1:w
+            imgtemp(i,j)=imgi(i,j)*power(-1,i+j);
+        end
+    end
+    imgfi=fft2(imgtemp);
+    switch method
+        case 'butterworth'%args(1)-截止频率,args(2)-阶次
+            filter=butterworthf(2*h,2*w,pass,args(1),args(2));
+        case 'gaussian'%args(1)-截止频率
+            filter=gaussianf(2*h,2*w,pass,args(1));
+        case 'laplace'
+            filter=laplacef(2*h,2*w);
+        case 'unmask'%args(1)-截止频率,args(2)-阶次,arg(3)-高提升滤波系数
+            filter=ones(2*h,2*w)+(ones(2*h,2*w)-butterworthf(2*h,2*w,'lowpass',args(1),args(2))).*args(3);
+    end
+    imgfo=imgfi.*filter;
+    imgo=ifft2(imgfo);
+    imgo=real(imgo(1:h,1:w));
+    imgo=real(imgo);
+    for i=1:h
+        for j=1:w
+            imgo(i,j)=imgo(i,j)*power(-1,i+j);
+        end
+    end
+end
+
